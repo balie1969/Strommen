@@ -7,6 +7,8 @@ import CostOverview from '@/components/CostOverview';
 
 import HistoricalPriceChart from '@/components/HistoricalPriceChart';
 import MonthlySavingsChart from '@/components/MonthlySavingsChart';
+import WeatherCard from '@/components/WeatherCard';
+import { getWeatherData } from '@/lib/weather';
 
 export default async function Home({
   searchParams,
@@ -33,6 +35,12 @@ export default async function Home({
 
         {/* Cost Overview */}
         <CostOverview cost={data.cost} />
+
+        {/* Weather Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <WeatherCard data={await getWeatherData('vinneslia')} />
+          <WeatherCard data={await getWeatherData('nome')} />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content (Charts) */}
