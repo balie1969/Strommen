@@ -1,3 +1,8 @@
+Henter data fra Tibber via deres API.
+
+.env.local må inneholde TIBBER_API_TOKEN=din API nøkkel
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
