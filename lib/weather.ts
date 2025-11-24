@@ -4,11 +4,15 @@ export interface WeatherData {
     location: string;
     current: {
         temp: number;
+        minTemp: number;
+        maxTemp: number;
         symbol: string;
     };
     forecast: {
         date: string; // "Man", "Tir", etc.
         temp: number;
+        minTemp: number;
+        maxTemp: number;
         symbol: string;
     }[];
 }
