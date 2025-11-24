@@ -1,5 +1,12 @@
 Henter data fra Tibber via deres API.
 
+Viser historisk spotpris for forrige og nåværende måned.
+Viser Norgespris som referanse.
+Viser snittverdi, laveste og høyeste verdi for måned.
+Viser spart verdi for dag, måned og totalt.
+Viser kostnader i dag, måned og estimat for totalen.
+
+
 .env.local må inneholde TIBBER_API_TOKEN=din API nøkkel
 
 
