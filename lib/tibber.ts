@@ -51,7 +51,8 @@ export interface TibberData {
   };
 }
 
-const NORGESPRIS_BASELINE = 0.50; // NOK/kWh including VAT
+const SUBSIDY_THRESHOLD = 0.9375; // NOK/kWh including VAT
+const SUBSIDY_PERCENTAGE = 0.90;
 
 export const getTibberData = async (homeId?: string): Promise<TibberData> => {
   const token = process.env.TIBBER_API_TOKEN;
@@ -153,15 +154,16 @@ export const getTibberData = async (homeId?: string): Promise<TibberData> => {
       throw new Error('Home not found');
     }
 
-    // Calculate savings
+    // Calculate savings (Subsidy)
     const calculateSavings = (nodes: any[], fromDate?: Date) => {
       return nodes.reduce((acc, node) => {
         const nodeDate = new Date(node.from);
         if (fromDate && nodeDate < fromDate) return acc;
 
-        // Savings = (SpotPrice - Norgespris) * Consumption
-        // Note: unitPrice includes VAT, Norgespris includes VAT
-        const savings = (node.unitPrice - NORGESPRIS_BASELINE) * node.consumption;
+        // Subsidy = (SpotPrice - Threshold) * 0.90 * Consumption
+        // Only if SpotPrice > Threshold
+        const subsidyPerKwh = Math.max(0, (node.unitPrice - SUBSIDY_THRESHOLD) * SUBSIDY_PERCENTAGE);
+        const savings = subsidyPerKwh * node.consumption;
         return acc + savings;
       }, 0);
     };
@@ -222,7 +224,8 @@ export const getTibberData = async (homeId?: string): Promise<TibberData> => {
           // Capitalize first letter
           const formattedMonth = monthKey.charAt(0).toUpperCase() + monthKey.slice(1);
 
-          const savings = (node.unitPrice - NORGESPRIS_BASELINE) * node.consumption;
+          const subsidyPerKwh = Math.max(0, (node.unitPrice - SUBSIDY_THRESHOLD) * SUBSIDY_PERCENTAGE);
+          const savings = subsidyPerKwh * node.consumption;
 
           if (!savingsByMonth[formattedMonth]) {
             savingsByMonth[formattedMonth] = 0;

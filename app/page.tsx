@@ -61,22 +61,22 @@ export default async function Home({
               <SavingsCard
                 title="I dag"
                 amount={data.savings.today}
-                description="Spart sammenlignet med Norgespris"
+                description="Estimert strømstøtte"
               />
               <SavingsCard
                 title="Denne måneden"
                 amount={data.savings.thisMonth}
-                description="Akkumulert sparing hittil i måneden"
+                description="Akkumulert støtte hittil i måneden"
               />
               <SavingsCard
                 title="Forrige måned"
                 amount={data.savings.lastMonth}
-                description="Total sparing forrige måned"
+                description="Total støtte forrige måned"
               />
               <SavingsCard
                 title="Siden 1. oktober"
                 amount={data.savings.sinceOctober}
-                description="Total sparing siden startdato"
+                description="Total støtte siden startdato"
                 highlight
               />
             </div>

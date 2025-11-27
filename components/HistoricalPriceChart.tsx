@@ -18,7 +18,7 @@ interface HistoricalPriceChartProps {
     }[];
 }
 
-const NORGESPRIS_BASELINE = 0.50;
+const SUBSIDY_THRESHOLD = 0.9375;
 
 export default function HistoricalPriceChart({ data }: HistoricalPriceChartProps) {
     const prices = data.map(d => d.price);
@@ -83,12 +83,12 @@ export default function HistoricalPriceChart({ data }: HistoricalPriceChartProps
                             formatter={(value: number) => [`${value.toFixed(2)} kr/kWh`, 'Spotpris']}
                         />
                         <ReferenceLine
-                            y={NORGESPRIS_BASELINE}
+                            y={SUBSIDY_THRESHOLD}
                             stroke="#fb923c"
                             strokeDasharray="5 5"
                             strokeWidth={2}
                             label={{
-                                value: `Norgespris (${NORGESPRIS_BASELINE.toFixed(2)} kr)`,
+                                value: `Strømstøtte innslag (${SUBSIDY_THRESHOLD.toFixed(2)} kr)`,
                                 fill: '#fb923c',
                                 fontSize: 12,
                                 position: 'insideTopRight',
