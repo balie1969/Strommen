@@ -24,9 +24,12 @@ export default function ConsumptionChart({ data }: ConsumptionChartProps) {
         );
     }
 
+    const NORGESPRIS_BASELINE = 0.50;
+
     const formattedData = data.map((item) => ({
         ...item,
         time: new Date(item.from).getHours().toString().padStart(2, '0') + ':00',
+        cost: item.consumption * NORGESPRIS_BASELINE,
     }));
 
     const consumptions = formattedData.map(d => d.consumption);
@@ -54,7 +57,7 @@ export default function ConsumptionChart({ data }: ConsumptionChartProps) {
 
             {/* Chart */}
             <div className="p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                <h3 className="text-lg font-medium text-white mb-4">Forbruk (Siste 24 timer)</h3>
+                <h3 className="text-lg font-medium text-white mb-4">Forbruk og Kostnad (Siste 24 timer)</h3>
                 <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={formattedData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
@@ -68,9 +71,19 @@ export default function ConsumptionChart({ data }: ConsumptionChartProps) {
                                 tickLine={false}
                             />
                             <YAxis
+                                yAxisId="left"
                                 stroke="rgba(255,255,255,0.5)"
                                 tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }}
                                 label={{ value: 'kWh', angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.7)' }}
+                                axisLine={false}
+                                tickLine={false}
+                            />
+                            <YAxis
+                                yAxisId="right"
+                                orientation="right"
+                                stroke="#fb923c"
+                                tick={{ fill: '#fb923c', fontSize: 12 }}
+                                label={{ value: 'NOK', angle: 90, position: 'insideRight', fill: '#fb923c' }}
                                 axisLine={false}
                                 tickLine={false}
                             />
@@ -83,15 +96,30 @@ export default function ConsumptionChart({ data }: ConsumptionChartProps) {
                                 }}
                                 itemStyle={{ color: '#fff' }}
                                 cursor={{ fill: 'rgba(255,255,255,0.1)' }}
-                                formatter={(value: number) => [`${value.toFixed(2)} kWh`, 'Forbruk']}
+                                formatter={(value: number, name: string) => [
+                                    name === 'consumption' ? `${value.toFixed(2)} kWh` : `${value.toFixed(2)} kr`,
+                                    name === 'consumption' ? 'Forbruk' : 'Kostnad (Norgespris)'
+                                ]}
                             />
                             <Line
+                                yAxisId="left"
                                 type="monotone"
                                 dataKey="consumption"
                                 stroke="#60a5fa"
                                 strokeWidth={2}
                                 dot={{ fill: '#60a5fa', r: 3 }}
                                 activeDot={{ r: 5 }}
+                                name="consumption"
+                            />
+                            <Line
+                                yAxisId="right"
+                                type="monotone"
+                                dataKey="cost"
+                                stroke="#fb923c"
+                                strokeWidth={2}
+                                dot={{ fill: '#fb923c', r: 3 }}
+                                activeDot={{ r: 5 }}
+                                name="cost"
                             />
                         </LineChart>
                     </ResponsiveContainer>

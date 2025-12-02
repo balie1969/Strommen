@@ -10,24 +10,34 @@ interface ElectricityPriceChartProps {
 
 export function ElectricityPriceChart({ todayPrices, tomorrowPrices }: ElectricityPriceChartProps) {
     const currentHour = new Date().getHours();
-    const NORGESPRIS_BASELINE = 0.50; // NOK/kWh including VAT
+    const SUBSIDY_THRESHOLD = 0.9375;
+    const SUBSIDY_PERCENTAGE = 0.90;
+    const NORGESPRIS_BASELINE = 0.50;
 
     // Combine today and tomorrow's prices
     const allPrices = [
-        ...todayPrices.map((price, index) => ({
-            hour: index,
-            price: price.total,
-            time: new Date(price.startsAt).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }),
-            day: 'I dag',
-            isCurrentHour: index === currentHour,
-        })),
-        ...(tomorrowPrices?.map((price, index) => ({
-            hour: index + 24,
-            price: price.total,
-            time: new Date(price.startsAt).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }),
-            day: 'I morgen',
-            isCurrentHour: false,
-        })) || []),
+        ...todayPrices.map((price, index) => {
+            const subsidy = Math.max(0, (price.total - SUBSIDY_THRESHOLD) * SUBSIDY_PERCENTAGE);
+            return {
+                hour: index,
+                price: price.total,
+                priceWithSubsidy: price.total - subsidy,
+                time: new Date(price.startsAt).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }),
+                day: 'I dag',
+                isCurrentHour: index === currentHour,
+            };
+        }),
+        ...(tomorrowPrices?.map((price, index) => {
+            const subsidy = Math.max(0, (price.total - SUBSIDY_THRESHOLD) * SUBSIDY_PERCENTAGE);
+            return {
+                hour: index + 24,
+                price: price.total,
+                priceWithSubsidy: price.total - subsidy,
+                time: new Date(price.startsAt).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }),
+                day: 'I morgen',
+                isCurrentHour: false,
+            };
+        }) || []),
     ];
 
     if (allPrices.length === 0) {
@@ -89,7 +99,10 @@ export function ElectricityPriceChart({ todayPrices, tomorrowPrices }: Electrici
                                     borderRadius: '8px',
                                     color: 'white',
                                 }}
-                                formatter={(value: number) => [`${value.toFixed(2)} kr/kWh`, 'Pris']}
+                                formatter={(value: number, name: string) => [
+                                    `${value.toFixed(2)} kr/kWh`,
+                                    name === 'price' ? 'Spotpris' : 'Med strømstøtte'
+                                ]}
                                 labelFormatter={(label, payload) => {
                                     if (payload && payload[0]) {
                                         return `${payload[0].payload.day} - ${label}`;
@@ -122,6 +135,16 @@ export function ElectricityPriceChart({ todayPrices, tomorrowPrices }: Electrici
                                 strokeWidth={2}
                                 dot={{ fill: '#60a5fa', r: 3 }}
                                 activeDot={{ r: 5 }}
+                                name="price"
+                            />
+                            <Line
+                                type="monotone"
+                                dataKey="priceWithSubsidy"
+                                stroke="#4ade80"
+                                strokeWidth={2}
+                                dot={{ fill: '#4ade80', r: 3 }}
+                                activeDot={{ r: 5 }}
+                                name="priceWithSubsidy"
                             />
                         </LineChart>
                     </ResponsiveContainer>

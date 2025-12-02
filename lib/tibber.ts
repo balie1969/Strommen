@@ -49,10 +49,14 @@ export interface TibberData {
     thisMonth: number;
     forecast: number;
   };
+  consumptionOverview: {
+    today: number;
+    thisMonth: number;
+    forecast: number;
+  };
 }
 
-const SUBSIDY_THRESHOLD = 0.9375; // NOK/kWh including VAT
-const SUBSIDY_PERCENTAGE = 0.90;
+const NORGESPRIS_BASELINE = 0.50; // NOK/kWh including VAT
 
 export const getTibberData = async (homeId?: string): Promise<TibberData> => {
   const token = process.env.TIBBER_API_TOKEN;
@@ -154,16 +158,15 @@ export const getTibberData = async (homeId?: string): Promise<TibberData> => {
       throw new Error('Home not found');
     }
 
-    // Calculate savings (Subsidy)
+    // Calculate savings
     const calculateSavings = (nodes: any[], fromDate?: Date) => {
       return nodes.reduce((acc, node) => {
         const nodeDate = new Date(node.from);
         if (fromDate && nodeDate < fromDate) return acc;
 
-        // Subsidy = (SpotPrice - Threshold) * 0.90 * Consumption
-        // Only if SpotPrice > Threshold
-        const subsidyPerKwh = Math.max(0, (node.unitPrice - SUBSIDY_THRESHOLD) * SUBSIDY_PERCENTAGE);
-        const savings = subsidyPerKwh * node.consumption;
+        // Savings = (SpotPrice - Norgespris) * Consumption
+        // Note: unitPrice includes VAT, Norgespris includes VAT
+        const savings = (node.unitPrice - NORGESPRIS_BASELINE) * node.consumption;
         return acc + savings;
       }, 0);
     };
@@ -224,8 +227,7 @@ export const getTibberData = async (homeId?: string): Promise<TibberData> => {
           // Capitalize first letter
           const formattedMonth = monthKey.charAt(0).toUpperCase() + monthKey.slice(1);
 
-          const subsidyPerKwh = Math.max(0, (node.unitPrice - SUBSIDY_THRESHOLD) * SUBSIDY_PERCENTAGE);
-          const savings = subsidyPerKwh * node.consumption;
+          const savings = (node.unitPrice - NORGESPRIS_BASELINE) * node.consumption;
 
           if (!savingsByMonth[formattedMonth]) {
             savingsByMonth[formattedMonth] = 0;
@@ -260,6 +262,24 @@ export const getTibberData = async (homeId?: string): Promise<TibberData> => {
           const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
           const avgDailyCost = totalCostSoFar / daysSoFar;
           return totalCostSoFar + (avgDailyCost * (daysInMonth - daysSoFar));
+        })(),
+      },
+      consumptionOverview: {
+        today: currentHome.hourly.nodes
+          .filter((n: any) => new Date(n.from) >= today)
+          .reduce((acc: number, node: any) => acc + node.consumption, 0),
+        thisMonth: currentHome.daily.nodes
+          .filter((n: any) => new Date(n.from) >= startOfMonth)
+          .reduce((acc: number, node: any) => acc + node.consumption, 0),
+        forecast: (() => {
+          const monthNodes = currentHome.daily.nodes.filter((n: any) => new Date(n.from) >= startOfMonth);
+          const totalConsumptionSoFar = monthNodes.reduce((acc: number, node: any) => acc + node.consumption, 0);
+          const daysSoFar = monthNodes.length;
+          if (daysSoFar === 0) return 0;
+
+          const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+          const avgDailyConsumption = totalConsumptionSoFar / daysSoFar;
+          return totalConsumptionSoFar + (avgDailyConsumption * (daysInMonth - daysSoFar));
         })(),
       },
     };

@@ -33,7 +33,7 @@ export default function MonthlySavingsChart({ data }: MonthlySavingsChartProps) 
         <div className="w-full h-full bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-6">
             <div className="flex justify-between items-start mb-6">
                 <div>
-                    <h2 className="text-lg font-medium text-white">Månedlig strømstøtte</h2>
+                    <h2 className="text-lg font-medium text-white">Månedlig besparelse</h2>
                     <p className="text-sm text-gray-400">Siden 1. oktober 2025</p>
                 </div>
                 <div className="text-right">

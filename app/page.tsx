@@ -34,7 +34,7 @@ export default async function Home({
         </header>
 
         {/* Cost Overview */}
-        <CostOverview cost={data.cost} />
+        <CostOverview cost={data.cost} consumption={data.consumptionOverview} />
 
         {/* Weather Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -61,22 +61,22 @@ export default async function Home({
               <SavingsCard
                 title="I dag"
                 amount={data.savings.today}
-                description="Estimert strømstøtte"
+                description="Spart sammenlignet med Norgespris"
               />
               <SavingsCard
                 title="Denne måneden"
                 amount={data.savings.thisMonth}
-                description="Akkumulert støtte hittil i måneden"
+                description="Akkumulert sparing hittil i måneden"
               />
               <SavingsCard
                 title="Forrige måned"
                 amount={data.savings.lastMonth}
-                description="Total støtte forrige måned"
+                description="Total sparing forrige måned"
               />
               <SavingsCard
                 title="Siden 1. oktober"
                 amount={data.savings.sinceOctober}
-                description="Total støtte siden startdato"
+                description="Total sparing siden startdato"
                 highlight
               />
             </div>
