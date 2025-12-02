@@ -19,6 +19,7 @@ interface HistoricalPriceChartProps {
 }
 
 const SUBSIDY_THRESHOLD = 0.9375;
+const NORGESPRIS_BASELINE = 0.50;
 
 export default function HistoricalPriceChart({ data }: HistoricalPriceChartProps) {
     const prices = data.map(d => d.price);
@@ -92,6 +93,18 @@ export default function HistoricalPriceChart({ data }: HistoricalPriceChartProps
                                 fill: '#fb923c',
                                 fontSize: 12,
                                 position: 'insideTopRight',
+                            }}
+                        />
+                        <ReferenceLine
+                            y={NORGESPRIS_BASELINE}
+                            stroke="#4ade80"
+                            strokeDasharray="5 5"
+                            strokeWidth={2}
+                            label={{
+                                value: `Norgespris (${NORGESPRIS_BASELINE.toFixed(2)} kr)`,
+                                fill: '#4ade80',
+                                fontSize: 12,
+                                position: 'insideBottomRight',
                             }}
                         />
                         <Line
