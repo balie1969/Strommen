@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  basePath: '/strom',
+  /* config options here */
 };
 
 export default nextConfig;
