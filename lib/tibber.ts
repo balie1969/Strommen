@@ -109,7 +109,7 @@ export const getTibberData = async (homeId?: string): Promise<TibberData> => {
               }
             }
           }
-          daily: consumption(resolution: DAILY, last: 100) {
+          daily: consumption(resolution: DAILY, last: 365) {
             nodes {
               from
               to
@@ -158,6 +158,16 @@ export const getTibberData = async (homeId?: string): Promise<TibberData> => {
       throw new Error('Home not found');
     }
 
+    console.log('--- Debug Home ---');
+    console.log('Home ID:', currentHome.id);
+    console.log('Address:', currentHome.address?.address1);
+    console.log('Total Daily Nodes:', currentHome.daily.nodes.length);
+    if (currentHome.daily.nodes.length > 0) {
+      console.log('First Node Date:', currentHome.daily.nodes[0].from);
+      console.log('Last Node Date:', currentHome.daily.nodes[currentHome.daily.nodes.length - 1].from);
+    }
+    console.log('------------------');
+
     // Calculate savings
     const calculateSavings = (nodes: any[], fromDate?: Date) => {
       return nodes.reduce((acc, node) => {
@@ -195,6 +205,27 @@ export const getTibberData = async (homeId?: string): Promise<TibberData> => {
       })
     );
     const sinceOctoberSavings = calculateSavings(currentHome.daily.nodes, startOfOctober);
+
+    // Debug logging
+    console.log('--- Debug Savings ---');
+    console.log('Start of October:', startOfOctober.toISOString());
+    console.log('Start of Last Month:', startOfLastMonth.toISOString());
+
+    const octoberNodes = currentHome.daily.nodes.filter((n: any) => {
+      const d = new Date(n.from);
+      return d >= startOfOctober && d < new Date('2025-11-01');
+    });
+    const octoberSavings = calculateSavings(octoberNodes);
+    console.log('October Nodes:', octoberNodes.length);
+    console.log('October Savings:', octoberSavings);
+    if (octoberNodes.length > 0) {
+      const avgPrice = octoberNodes.reduce((acc: number, n: any) => acc + n.unitPrice, 0) / octoberNodes.length;
+      console.log('October Avg Price:', avgPrice);
+    }
+
+    console.log('Last Month (Nov) Savings:', lastMonthSavings);
+    console.log('Since October Savings:', sinceOctoberSavings);
+    console.log('---------------------');
 
     return {
       homes: viewer.homes,

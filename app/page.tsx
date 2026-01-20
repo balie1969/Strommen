@@ -1,14 +1,18 @@
+import dynamic from 'next/dynamic';
 import { getTibberData } from '@/lib/tibber';
-import { ElectricityPriceChart } from '@/components/ElectricityPriceChart';
-import ConsumptionChart from '@/components/ConsumptionChart';
 import SavingsCard from '@/components/SavingsCard';
 import HomeSelector from '@/components/HomeSelector';
 import CostOverview from '@/components/CostOverview';
-
-import HistoricalPriceChart from '@/components/HistoricalPriceChart';
-import MonthlySavingsChart from '@/components/MonthlySavingsChart';
 import WeatherCard from '@/components/WeatherCard';
 import { getWeatherData } from '@/lib/weather';
+
+const ElectricityPriceChart = dynamic(
+  () => import('@/components/ElectricityPriceChart').then((mod) => mod.ElectricityPriceChart),
+  { ssr: false }
+);
+const ConsumptionChart = dynamic(() => import('@/components/ConsumptionChart'), { ssr: false });
+const HistoricalPriceChart = dynamic(() => import('@/components/HistoricalPriceChart'), { ssr: false });
+const MonthlySavingsChart = dynamic(() => import('@/components/MonthlySavingsChart'), { ssr: false });
 
 export default async function Home({
   searchParams,
