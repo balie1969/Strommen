@@ -1,18 +1,10 @@
-import dynamic from 'next/dynamic';
 import { getTibberData } from '@/lib/tibber';
 import SavingsCard from '@/components/SavingsCard';
 import HomeSelector from '@/components/HomeSelector';
 import CostOverview from '@/components/CostOverview';
 import WeatherCard from '@/components/WeatherCard';
 import { getWeatherData } from '@/lib/weather';
-
-const ElectricityPriceChart = dynamic(
-  () => import('@/components/ElectricityPriceChart').then((mod) => mod.ElectricityPriceChart),
-  { ssr: false }
-);
-const ConsumptionChart = dynamic(() => import('@/components/ConsumptionChart'), { ssr: false });
-const HistoricalPriceChart = dynamic(() => import('@/components/HistoricalPriceChart'), { ssr: false });
-const MonthlySavingsChart = dynamic(() => import('@/components/MonthlySavingsChart'), { ssr: false });
+import DashboardCharts from '@/components/DashboardCharts';
 
 export default async function Home({
   searchParams,
@@ -48,15 +40,13 @@ export default async function Home({
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content (Charts) */}
-          <div className="lg:col-span-2 space-y-8">
-            <ElectricityPriceChart
-              todayPrices={data.todayPrices}
-              tomorrowPrices={data.tomorrowPrices}
-            />
-            <ConsumptionChart data={data.consumption} />
-            <HistoricalPriceChart data={data.historicalPrices} />
-            <MonthlySavingsChart data={data.monthlySavings} />
-          </div>
+          <DashboardCharts
+            todayPrices={data.todayPrices}
+            tomorrowPrices={data.tomorrowPrices}
+            consumption={data.consumption}
+            historicalPrices={data.historicalPrices}
+            monthlySavings={data.monthlySavings}
+          />
 
           {/* Sidebar (Savings) */}
           <div className="space-y-8">
